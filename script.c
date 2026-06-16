@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define BUFFER_SIZE (1 << 16)
 
@@ -63,7 +64,7 @@ int main(const int argc, const char *const argv[]) {
     }
 
     if (ferror(from_file)) {
-        fprintf(stderr, "Error reading from file \"%s\"", from_fle_name);
+        fprintf(stderr, "Error reading from file \"%s\"", from_file_name);
         return_code = -1;
     }
 
