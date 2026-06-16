@@ -2,19 +2,20 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #define BUFFER_SIZE (1 << 16)
 
 int main(const int argc, const char *const argv[]) {
     if (argc != 3) {
-        fprintf(stderr, "Incorrect usage! Usage: \"script <input file> <output file>\"");
-        return -1;
+        fprintf(stderr, "Incorrect usage! Usage: \"script <input file> <output file>\"\n");
+        return 1;
     }
 
     const char *const from_file_name = argv[1], *const to_file_name = argv[2];
     if ((strlen(from_file_name) == strlen(to_file_name)) && !strcmp(from_file_name, to_file_name)) {
-        fprintf(stderr, "Can't read from and write to the one single file at once!");
-        return -1;
+        fprintf(stderr, "Can't read from and write to the one single file at once!\n");
+        return 1;
     }
 
     int return_code = 0;
@@ -23,22 +24,22 @@ int main(const int argc, const char *const argv[]) {
 
     from_file = fopen(from_file_name, "r");
     if (!from_file) {
-        fprintf(stderr, "Error opening file \"%s\"", from_file_name);
-        return_code = -1;
+        fprintf(stderr, "Error opening file \"%s\": %s\n", from_file_name, strerror(errno));
+        return_code = 1;
         goto cleanup;
     }
 
     to_file = fopen(to_file_name, "w");
     if (!to_file) {
-        fprintf(stderr, "Error opening file \"%s\"", to_file_name);
-        return_code = -1;
+        fprintf(stderr, "Error opening file \"%s\": %s\n", to_file_name, strerror(errno));
+        return_code = 1;
         goto cleanup;
     }
 
     buffer = malloc(BUFFER_SIZE);
     if (!buffer) {
-        fprintf(stderr, "Error allocating %zu bytes of memory!", (size_t) BUFFER_SIZE);
-        return_code = -1;
+        fprintf(stderr, "Error allocating %zu bytes of memory: %s\n", (size_t) BUFFER_SIZE, strerror(errno));
+        return_code = 1;
         goto cleanup;
     }
 
@@ -64,8 +65,8 @@ int main(const int argc, const char *const argv[]) {
     }
 
     if (ferror(from_file)) {
-        fprintf(stderr, "Error reading from file \"%s\"", from_file_name);
-        return_code = -1;
+        fprintf(stderr, "Error reading from file \"%s\": %s\n", from_file_name, strerror(errno));
+        return_code = 1;
     }
 
     cleanup:
